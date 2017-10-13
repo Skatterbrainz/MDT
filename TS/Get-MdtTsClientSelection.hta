@@ -2,8 +2,8 @@
 <head>
 <title>Select Device Location</title>
 <HTA:APPLICATION
-Application ID="DeviceLoc"
-ApplicationName="DeviceLoc"
+ID="DeviceLoc"
+APPLICATIONNAME="DeviceLoc"
 BORDER="thin"
 BorderStyle="Simple"
 Caption="YES"
@@ -27,34 +27,41 @@ body {background-color:#eee; font-family:verdana;}
 </style>
 
 <script language="VBScript">
-Const currWidth = 400
+Const currWidth  = 400
 Const currHeight = 300
 
-LocList = "Atlanta|OU=Workstations,OU=Atlanta,OU=Corp,DC=contoso,DC=com|OU=Users,OU=Atlanta,OU=Corp,DC=contoso,DC=com|CustomFile_ATL.bat^" & _
-"Boston|OU=Workstations,OU=Boston,OU=Corp,DC=contoso,DC=com|OU=Users,OU=Boston,OU=Corp,DC=contoso,DC=com|CustomFile_BOS.bat^" & _
-"Charlotte|OU=Workstations,OU=Charlotte,OU=Corp,DC=contoso,DC=com|OU=Users,OU=Charlotte,OU=Corp,DC=contoso,DC=com|CustomFile_CLT.bat^" & _
-"Denver|OU=Workstations,OU=Denver,OU=Corp,DC=contoso,DC=com|OU=Users,OU=Denver,OU=Corp,DC=contoso,DC=com|CustomFile_DEN.bat^" & _
-"Norfolk|OU=Workstations,OU=Norfolk,OU=Corp,DC=contoso,DC=com|OU=Users,OU=Norfolk,OU=Corp,DC=contoso,DC=com|CustomFile_ORF.bat"
+Dim FullName, arrFN, FileName, FilePath, LocFile, LocList
 
-Sub Window_OnLoad
-	window.resizeTo currWidth, currHeight
-	rowNum = 0
-	For Each Row in Split(LocList,"^")
-		RowSet = Split(Row, "|")
-		Set objOption = Document.createElement("OPTION")
-		objOption.Text = RowSet(0)
-		objOption.Value = rowNum
-		loc.Add(objOption)
-		rowNum = rowNum + 1
-	Next
-End Sub
+FullName = Replace(DeviceLoc.commandLine,Chr(34),"")
+arrFN    = Split(FullName, "\")
+FileName = arrFN(Ubound(arrFN))
+FilePath = Replace(FullName,FileName,"")
+LocFile  = FilePath & "\locations.txt"
+LocList  = ""
+
+'MsgBox "Script Path: " & FilePath, vbOkOnly+vbInformation, "Info"
+
+Function LoadData (DataFile)
+	Dim fso, f
+	Set fso = CreateObject("Scripting.FileSystemObject")
+	On Error Resume Next
+	Set f = fso.OpenTextFile(DataFile, 1)
+	If err.Number = 0 Then
+		result = f.ReadAll
+		f.Close
+	End If
+	'MsgBox "List has been loaded", vbOkOnly+vbInformation, "Info"
+	LoadData = result
+End Function
 
 Function GetSelectedRowData (Index)
-	arrData = Split(LocList,"^")
+	Dim arrData, selData, arrList, ouPath, fnName
+	'MsgBox "Getting data from list", vbOkOnly+vbInformation, "Info"
+	arrData = Split(LocList,vbCRLF)
 	selData = arrData(Index)
 	arrList = Split(selData,"|")
-	ouPath = arrList(1)
-	fnName = arrList(3)
+	ouPath  = arrList(1)
+	fnName  = arrList(3)
 	GetSelectedRowData = ouPath & "|" & fnName
 End Function
 
@@ -66,14 +73,43 @@ Sub OkButton_Click
 	Next
 	result = GetSelectedRowData (RowIndex)
 	dataSet = Split(result, "|")
-	'MsgBox "RowIndex: " & RowIndex, okOnly, "Result"
-	'MsgBox "OUPath: " & dataSet(0), okOnly, "Value Assignment"
-	'MsgBox "Filename: " & dataSet(1), okOnly, "Value Assignment"
+	
+	On Error Resume Next
 	Set objTSenv = CreateObject("Microsoft.SMS.TSEnvironment")
-	objTSenv("MachineObjectOU") = dataSet(0)
-	objTSenv("CustomAppFile") = dataSet(1)
+	If err.Number = 0 Then
+		objTSenv("MachineObjectOU") = dataSet(0)
+		objTSenv("CustomAppFile") = dataSet(1)
+	Else
+		MsgBox "WinPE task sequence engine not running", vbOkOnly+vbExclamation, "Warning"
+		MsgBox "OUPath: " & dataSet(0), okOnly+vbInformation, "Value Assignment"
+		MsgBox "Filename: " & dataSet(1), okOnly+vbInformation, "Value Assignment"
+	End If
 	window.Close()
 End Sub
+
+Sub Window_OnLoad
+	Dim rowNum, objOption, RowSet, LocData, DataRow
+	window.resizeTo currWidth, currHeight
+	rowNum = 0
+	LocList = LoadData(LocFile)
+	If LocList <> "" Then
+		LocData = Split(LocList, vbCRLF)
+		'MsgBox "List Rows: " & Ubound(LocData)+1, okOnly+vbInformation, "Value Assignment"
+		On Error Resume Next
+		For Each DataRow in Split(LocList,vbCRLF)
+			RowSet = Split(DataRow, "|")
+			Set objOption = Document.createElement("OPTION")
+			objOption.Text  = RowSet(0)
+			objOption.Value = rowNum
+			loc.Add(objOption)
+			rowNum = rowNum + 1
+		Next
+		'MsgBox "LastIndex: " & rowNum, okOnly+vbInformation, "Value Assignment"
+	Else
+		MsgBox "Failed to open input file!", okOnly+vbCritical, "Error"
+	End If
+End Sub
+
 </script>
 </head>
 
@@ -81,7 +117,7 @@ End Sub
 	<table width="100%" border="0">
 		<tr>
 			<td>
-				<select name="loc" id="loc" size="5" class="listbox1">
+				<select name="loc" id="loc" size="9" class="listbox1">
 				</select>
 			</td>
 		</tr>
