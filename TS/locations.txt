@@ -1,0 +1,8 @@
+# ROW FORMAT: NAME | ComputersOU | UsersOU | CustomAppInstallerFile
+# NOTE: lines with a pound-sign prefix are ignored during processing
+Atlanta|OU=Workstations,OU=Atlanta,OU=Corp,DC=Contoso,DC=com|OU=Users,OU=Atlanta,OU=Corp,DC=Contoso,DC=com|CustomInstaller_ATL.exe
+Boston|OU=Workstations,OU=Boston,OU=Corp,DC=Contoso,DC=com|OU=Users,OU=Boston,OU=Corp,DC=Contoso,DC=com|CustomInstaller_BOS.exe
+Chicago|OU=Workstations,OU=Chicago,OU=Corp,DC=Contoso,DC=com|OU=Users,OU=Chicago,OU=Corp,DC=Contoso,DC=com|CustomInstaller_CHI.exe
+Denver|OU=Workstations,OU=Denver,OU=Corp,DC=Contoso,DC=com|OU=Users,OU=Denver,OU=Corp,DC=Contoso,DC=com|CustomInstaller_DEN.exe
+Norfolk|OU=Workstations,OU=Norfolk,OU=Corp,DC=Contoso,DC=com|OU=Users,OU=Norfolk,OU=Corp,DC=Contoso,DC=com|CustomInstaller_ORF.exe
+Seattle|OU=Workstations,OU=Seattle,OU=Corp,DC=Contoso,DC=com|OU=Users,OU=Seattle,OU=Corp,DC=Contoso,DC=com|CustomInstaller_SEA.exe
