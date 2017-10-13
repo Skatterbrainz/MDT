@@ -1,0 +1,95 @@
+<html>
+<head>
+<title>Select Device Location</title>
+<HTA:APPLICATION
+Application ID="DeviceLoc"
+ApplicationName="DeviceLoc"
+BORDER="thin"
+BorderStyle="Simple"
+Caption="YES"
+ContextMenu="NO"
+ICON=""
+INNERBORDER="NO"
+SCROLL="NO"
+SCROLLFLAT="YES"
+SINGLEINSTANCE="YES"
+VERSION="1.0"
+MAXIMIZEBUTTON="no"
+MINIMIZEBUTTON="no"
+WINDOWSTATE="NORMAL"
+/>
+
+<style type="text/css">
+body {background-color:#eee; font-family:verdana;}
+.button1 {width:100px;height:30px;font-family:verdana;text-align:center;margin:auto;}
+.v10 {font-family:verdana; font-size:10pt;}
+.listbox1 {width:360px; border:0; font-family:verdana;font-size:10pt;}
+</style>
+
+<script language="VBScript">
+Const currWidth = 400
+Const currHeight = 300
+
+LocList = "Atlanta|OU=Workstations,OU=Atlanta,OU=Corp,DC=contoso,DC=com|OU=Users,OU=Atlanta,OU=Corp,DC=contoso,DC=com|CustomFile_ATL.bat^" & _
+"Boston|OU=Workstations,OU=Boston,OU=Corp,DC=contoso,DC=com|OU=Users,OU=Boston,OU=Corp,DC=contoso,DC=com|CustomFile_BOS.bat^" & _
+"Charlotte|OU=Workstations,OU=Charlotte,OU=Corp,DC=contoso,DC=com|OU=Users,OU=Charlotte,OU=Corp,DC=contoso,DC=com|CustomFile_CLT.bat^" & _
+"Denver|OU=Workstations,OU=Denver,OU=Corp,DC=contoso,DC=com|OU=Users,OU=Denver,OU=Corp,DC=contoso,DC=com|CustomFile_DEN.bat^" & _
+"Norfolk|OU=Workstations,OU=Norfolk,OU=Corp,DC=contoso,DC=com|OU=Users,OU=Norfolk,OU=Corp,DC=contoso,DC=com|CustomFile_ORF.bat"
+
+Sub Window_OnLoad
+	window.resizeTo currWidth, currHeight
+	rowNum = 0
+	For Each Row in Split(LocList,"^")
+		RowSet = Split(Row, "|")
+		Set objOption = Document.createElement("OPTION")
+		objOption.Text = RowSet(0)
+		objOption.Value = rowNum
+		loc.Add(objOption)
+		rowNum = rowNum + 1
+	Next
+End Sub
+
+Function GetSelectedRowData (Index)
+	arrData = Split(LocList,"^")
+	selData = arrData(Index)
+	arrList = Split(selData,"|")
+	ouPath = arrList(1)
+	fnName = arrList(3)
+	GetSelectedRowData = ouPath & "|" & fnName
+End Function
+
+Sub OkButton_Click
+	For Each objListItem in loc
+		If objListItem.Selected Then
+			RowIndex = objListItem.Value
+		End If
+	Next
+	result = GetSelectedRowData (RowIndex)
+	dataSet = Split(result, "|")
+	'MsgBox "RowIndex: " & RowIndex, okOnly, "Result"
+	'MsgBox "OUPath: " & dataSet(0), okOnly, "Value Assignment"
+	'MsgBox "Filename: " & dataSet(1), okOnly, "Value Assignment"
+	Set objTSenv = CreateObject("Microsoft.SMS.TSEnvironment")
+	objTSenv("MachineObjectOU") = dataSet(0)
+	objTSenv("CustomAppFile") = dataSet(1)
+	window.Close()
+End Sub
+</script>
+</head>
+
+<body>
+	<table width="100%" border="0">
+		<tr>
+			<td>
+				<select name="loc" id="loc" size="5" class="listbox1">
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<input type="submit" class="button1" name="OKButton" id="OKButton" value="OK" onClick="OkButton_Click" tabindex="0" />
+			</td>
+		</tr>
+	</table>
+</body>
+</html>
