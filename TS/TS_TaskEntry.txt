@@ -1,0 +1,4 @@
+Add: New / General / Run Command Line
+
+Command: 
+cscript "%DeployRoot%\scripts\MDTRunWithServiceUI.wsf" /UIExePath:"%SystemRoot%\System32\mshta.exe" /UIExeParam:"%DeployRoot%\scripts\Get-MdtTsClientSelection.hta"
