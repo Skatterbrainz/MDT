@@ -13,7 +13,7 @@ INNERBORDER="NO"
 SCROLL="NO"
 SCROLLFLAT="YES"
 SINGLEINSTANCE="YES"
-VERSION="1.0"
+VERSION="1.2"
 MAXIMIZEBUTTON="no"
 MINIMIZEBUTTON="no"
 WINDOWSTATE="NORMAL"
@@ -73,7 +73,6 @@ Sub OkButton_Click
 	Next
 	result = GetSelectedRowData (RowIndex)
 	dataSet = Split(result, "|")
-	
 	On Error Resume Next
 	Set objTSenv = CreateObject("Microsoft.SMS.TSEnvironment")
 	If err.Number = 0 Then
@@ -97,12 +96,14 @@ Sub Window_OnLoad
 		'MsgBox "List Rows: " & Ubound(LocData)+1, okOnly+vbInformation, "Value Assignment"
 		On Error Resume Next
 		For Each DataRow in Split(LocList,vbCRLF)
-			RowSet = Split(DataRow, "|")
-			Set objOption = Document.createElement("OPTION")
-			objOption.Text  = RowSet(0)
-			objOption.Value = rowNum
-			loc.Add(objOption)
-			rowNum = rowNum + 1
+			If Left(DataRow,1) <> "#" Then
+				RowSet = Split(DataRow, "|")
+				Set objOption = Document.createElement("OPTION")
+				objOption.Text  = RowSet(0)
+				objOption.Value = rowNum
+				loc.Add(objOption)
+				rowNum = rowNum + 1
+			End If
 		Next
 		'MsgBox "LastIndex: " & rowNum, okOnly+vbInformation, "Value Assignment"
 	Else
