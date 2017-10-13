@@ -1,4 +1,9 @@
-Add: New / General / Run Command Line
+1. Download MDTRunWithServiceUI.wsf (zip file)
+  https://blogs.technet.microsoft.com/deploymentguys/2015/07/06/script-to-make-serviceui-exe-easier-to-use-for-osd-custom-user-interfaces/
 
-Command: 
-cscript "%DeployRoot%\scripts\MDTRunWithServiceUI.wsf" /UIExePath:"%SystemRoot%\System32\mshta.exe" /UIExeParam:"%DeployRoot%\scripts\Get-MdtTsClientSelection.hta"
+2. Copy the .wsf script, and your .hta script into the %DeployRoot%\scripts\ folder
+  example: Get-MdtTsClientSelection.hta (stored in %DeployRoot%\scripts\)
+
+3. Add task step in Task Sequence
+  Add: New / General / Run Command Line
+  Command: cscript "%DeployRoot%\scripts\MDTRunWithServiceUI.wsf" /UIExePath:"%SystemRoot%\System32\mshta.exe" /UIExeParam:"%DeployRoot%\scripts\Get-MdtTsClientSelection.hta"
